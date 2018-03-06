@@ -4,34 +4,29 @@ let dns = require('native-dns');
 let server = dns.createServer();
 let async = require('async');
 
+let conf = require('./dns-conf.json');
+let entries = conf.entries;
+let fallbackDNS = conf.fallbackDNS;
+
 server.on('listening', () => console.log('server listening on', server.address()));
 server.on('close', () => console.log('server closed', server.address()));
 server.on('error', (err, buff, req, res) => console.error(err.stack));
 server.on('socketError', (err, socket) => console.error(err));
 
-let entries = [
-  {
-    domain: "^mpw.de*",
-    records: [
-      { type: "A", address: "192.168.211.126", ttl: 1800 }
-    ]
-  }
-];
-
-let authority = { address: '8.8.8.8', port: 53, type: 'udp' };
-
-function proxy(question, response, cb) {
+function proxyToFallbackDNS(question, response, cb) {
   console.log('proxying', question.name);
 
   var request = dns.Request({
-    question: question, // forwarding the question
-    server: authority,  // this is the DNS server we are asking
+    question: question,
+    server: fallbackDNS,
     timeout: 1000
   });
 
-  // when we get answers, append them to the response
   request.on('message', (err, msg) => {
-    msg.answer.forEach(a => response.answer.push(a));
+    msg.answer.forEach(a => {
+      response.answer.push(a);
+      console.log('answering from fallback:', a);
+    });
   });
 
   request.on('end', cb);
@@ -44,21 +39,28 @@ function handleRequest(request, response) {
   let f = [];
 
   request.question.forEach(question => {
-    if (question.name === 'mpw.de') {
-    console.log('hier');
-      entries[0].records.forEach(record => {
-        record.name = question.name;
-        record.ttl = record.ttl || 1800;
-        response.answer.push(dns[record.type](record));
-      });
-    } else {
-      f.push(cb => proxy(question, response, cb));
+    let done = false;
+
+    for(let i = 0; i < entries.size && !done; i++) {
+      if(question.name.match(entries[i].domain)) {
+        entries[i].records.forEach(record => {
+          record.name = question.name;
+          record.ttl = record.ttl || 1800;
+          response.answer.push(dns[record.type](record));
+
+          console.log('answering from entries:', record.address);
+
+          done = true;
+        });
+      }
     }
+
+    if(!done) f.push(cb => proxyToFallbackDNS(question, response, cb));
   });
 
-  async.parallel(f, function() { response.send(); });
+  async.parallel(f, () => response.send());
 }
 
 server.on('request', handleRequest);
 
-server.serve(53);
+server.serve(53, conf.serverAddress);
