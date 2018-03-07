@@ -41,7 +41,7 @@ function handleRequest(request, response) {
   request.question.forEach(question => {
     let done = false;
 
-    for(let i = 0; i < entries.size && !done; i++) {
+    for(let i = 0; i < entries.length && !done; i++) {
       if(question.name.match(entries[i].domain)) {
         entries[i].records.forEach(record => {
           record.name = question.name;

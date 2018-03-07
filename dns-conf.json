@@ -1,5 +1,5 @@
 {
-  "serverAddress": "127.0.0.1",
+  "serverAddress": "0.0.0.0",
 
   "fallbackDNS": {
     "address": "8.8.8.8", "port": 53, "type": "udp"
@@ -9,7 +9,7 @@
     {
       "domain": "^mpw.de*",
       "records": [
-        { "type": "A", "address": "127.0.0.1", "ttl": 1800 }
+        { "type": "A", "address": "10.52.159.189", "ttl": 1800 }
       ]
     }
   ]
