@@ -7,9 +7,9 @@
 
   "entries": [
     {
-      "domain": "^mpw.de*",
+      "domain": "^thempw.com*",
       "records": [
-        { "type": "A", "address": "10.52.159.189", "ttl": 1800 }
+        { "type": "A", "address": "192.168.215.230", "ttl": 1800 }
       ]
     }
   ]
