@@ -25,7 +25,6 @@ function proxyToFallbackDNS(question, response, cb) {
   request.on('message', (err, msg) => {
     msg.answer.forEach(a => {
       response.answer.push(a);
-      console.log('answering from fallback:', a);
     });
   });
 

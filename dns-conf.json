@@ -7,9 +7,9 @@
 
   "entries": [
     {
-      "domain": "^thempw.com*",
+      "domain": "^test\\.example\\.com$",
       "records": [
-        { "type": "A", "address": "192.168.215.230", "ttl": 1800 }
+        { "type": "A", "address": "1.2.3.4", "ttl": 1800 }
       ]
     }
   ]

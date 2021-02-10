@@ -1,5 +1,7 @@
 # DNS proxy
 
+A minimal, configurable DNS server.
+
 ## Usage
 * adjust `dns-conf.json` to your needs
-* run ```sudo node index.js```
+* run ```npm start```
